@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://romanmontanov1-eng.github.io/rudnovskayaproduction/sitemap.xml
