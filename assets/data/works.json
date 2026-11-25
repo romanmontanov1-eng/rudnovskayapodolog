@@ -66,8 +66,8 @@
       "title": "Исправленное название",
       "before": "assets/images/pairs/12345678-1234-4234-8234-123456789abc/aafce0cd4088a4ca5363ac21c7c9919076179a8ece58c51b9ce3982ef9499efc.jpg",
       "after": "assets/images/pairs/12345678-1234-4234-8234-123456789abc/d94c07e4a3b8fdb991808324b74d0ae0182da329d60b87499c70d2cdef9a4073.jpg",
-      "visible": true,
-      "revision": 3,
+      "visible": false,
+      "revision": 4,
       "createdAt": "2026-11-25T02:57:23.335Z",
       "operations": [
         {
@@ -81,6 +81,10 @@
         {
           "id": "02948cbf-3dcd-49ea-ab4e-40a02d1105fe",
           "hash": "7a05508aafd2f6eaf10c2028fb34a8d66559d11bc3a442d860910d9a0331f031"
+        },
+        {
+          "id": "4f60f869-10f1-4b7e-b55b-89498869be28",
+          "hash": "15782584541e941260d8bce52092a8a36e2141b7304b2c91f7554de4eb5fa4d3"
         }
       ]
     }
