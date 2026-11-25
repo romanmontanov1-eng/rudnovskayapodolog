@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "works": [
+    {
+      "id": "case-1",
+      "title": "Уход за стопами и ногтями",
+      "before": "assets/images/works/case-1-before.svg",
+      "after": "assets/images/works/case-1-after.svg",
+      "visible": true,
+      "createdAt": "2026-10-15T12:00:06Z",
+      "revision": 1,
+      "operations": []
+    },
+    {
+      "id": "case-2",
+      "title": "Работа с ногтевой пластиной",
+      "before": "assets/images/works/case-2-before.svg",
+      "after": "assets/images/works/case-2-after.svg",
+      "visible": true,
+      "createdAt": "2026-10-15T12:00:05Z",
+      "revision": 1,
+      "operations": []
+    },
+    {
+      "id": "case-3",
+      "title": "Обработка изменённых ногтей",
+      "before": "assets/images/works/case-3-before.svg",
+      "after": "assets/images/works/case-3-after.svg",
+      "visible": true,
+      "createdAt": "2026-10-15T12:00:04Z",
+      "revision": 1,
+      "operations": []
+    },
+    {
+      "id": "case-4",
+      "title": "Уход за ногтями стопы",
+      "before": "assets/images/works/case-4-before.svg",
+      "after": "assets/images/works/case-4-after.svg",
+      "visible": true,
+      "createdAt": "2026-10-15T12:00:03Z",
+      "revision": 1,
+      "operations": []
+    },
+    {
+      "id": "case-5",
+      "title": "Обработка ногтевой пластины",
+      "before": "assets/images/works/case-5-before.svg",
+      "after": "assets/images/works/case-5-after.svg",
+      "visible": true,
+      "createdAt": "2026-10-15T12:00:02Z",
+      "revision": 1,
+      "operations": []
+    },
+    {
+      "id": "case-6",
+      "title": "Уход за ногтями рук",
+      "before": "assets/images/works/case-6-before.svg",
+      "after": "assets/images/works/case-6-after.svg",
+      "visible": true,
+      "createdAt": "2026-10-15T12:00:01Z",
+      "revision": 1,
+      "operations": []
+    }
+  ]
+}
