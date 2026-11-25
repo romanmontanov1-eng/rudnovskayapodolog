@@ -8,7 +8,7 @@ async function drafts(){const all=await tx('readonly',s=>s.getAll());for(const d
 function source(value){if(value instanceof Blob){const u=URL.createObjectURL(value);objectURLs.push(u);return u}return value?imageBase+value:''}
 function release(){objectURLs.forEach(URL.revokeObjectURL);objectURLs=[]}
 function photo(value,label){const img=new Image();img.src=source(value);img.alt=label;return img}
-async function api(path,options){let r;try{r=await fetch(path,options)}catch{const e=Error('Нет ответа от сервера.');e.unknown=true;throw e}const data=await r.json();if(!r.ok){if(r.status===401){$('#login').hidden=false;$('#home').hidden=true;$('#editor').hidden=true}const e=Error(data.error||'Не удалось выполнить запрос.');e.unknown=r.status>=500;throw e}return data}
+async function api(path,options){let r;try{r=await fetch(path,options)}catch{const e=Error('Нет ответа от сервера.');e.unknown=true;throw e}let data;try{data=await r.json()}catch{const e=Error('Ответ сервера получен не полностью.');e.unknown=r.ok||r.status>=500;throw e}if(!r.ok){if(r.status===401){$('#login').hidden=false;$('#home').hidden=true;$('#editor').hidden=true}const e=Error(data.error||'Не удалось выполнить запрос.');e.unknown=r.status>=500;throw e}return data}
 function show(section){for(const id of ['login','home','editor'])$('#'+id).hidden=id!==section;window.scrollTo(0,0)}
 function lock(value){busy=value;document.querySelectorAll('#editor button,#editor input').forEach(el=>el.disabled=value)}
 function changed(){current.operation=null;current.updated=Date.now();persist()}
