@@ -60,6 +60,21 @@
       "createdAt": "2026-10-15T12:00:01Z",
       "revision": 1,
       "operations": []
+    },
+    {
+      "id": "12345678-1234-4234-8234-123456789abc",
+      "title": "Тестовая работа",
+      "before": "assets/images/pairs/12345678-1234-4234-8234-123456789abc/20b0273652008f123a934c6af313788961a2c15314e110b42a3924c4ff94549b.jpg",
+      "after": "assets/images/pairs/12345678-1234-4234-8234-123456789abc/d94c07e4a3b8fdb991808324b74d0ae0182da329d60b87499c70d2cdef9a4073.jpg",
+      "visible": true,
+      "revision": 1,
+      "createdAt": "2026-11-25T02:57:23.335Z",
+      "operations": [
+        {
+          "id": "fcf8f9c1-bdcf-464d-b156-119399b08077",
+          "hash": "96ae05ba105a3c7a7e197c2272908cb875d3e07dc9b074a65e2bcc9d1d4ba4ab"
+        }
+      ]
     }
   ]
 }
