@@ -1,0 +1,14 @@
+media:
+  input: assets/images/pairs
+  output: assets/images/pairs
+content:
+  - name: works
+    label: Работы
+    type: collection
+    path: _data/gallery
+    format: json
+    filename: "{year}-{month}-{day}-{hour}-{minute}-{second}-{primary}.json"
+    fields:
+      - {name: title, label: Название работы, type: string, required: true}
+      - {name: before, label: Фото до, type: image, required: true}
+      - {name: after, label: Фото после, type: image, required: true}
