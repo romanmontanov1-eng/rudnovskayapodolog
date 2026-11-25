@@ -44,6 +44,7 @@ export async function saveWork(repo,input){
 export function createServer(assets,{repository=env=>new GitRepository(env),fetcher=fetch}={}){return {async fetch(req,env){try{
  const url=new URL(req.url),path=url.pathname;
  const security={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://raw.githubusercontent.com https://romanmontanov1-eng.github.io; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"};
+ if(/^\/icon-(180|192|512)\.png$/.test(path)&&assets.icons){const size=path.match(/(180|192|512)/)[1];return new Response(unbase64(assets.icons[size]),{headers:{...security,'Content-Type':'image/png'}});}
  if(path==='/icon.svg')return new Response(assets.icon,{headers:{...security,'Content-Type':'image/svg+xml'}});
  if(path==='/manifest.webmanifest')return json(assets.manifest);
  if(!env.ADMIN_PASSWORD||!env.GITHUB_TOKEN)return json({error:'Кабинет ещё не настроен.'},503);
