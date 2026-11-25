@@ -9,7 +9,7 @@ GALLERY_BRANCH = "main"
 [[ratelimits]]
 name = "LOGIN_LIMITER"
 namespace_id = "1001"
-simple_limit = { limit = 5, period = 60 }
+simple = { limit = 5, period = 60 }
 
 [env.staging]
 name = "olga-works-staging"
@@ -19,4 +19,4 @@ GALLERY_BRANCH = "olga-publication-test"
 [[env.staging.ratelimits]]
 name = "LOGIN_LIMITER"
 namespace_id = "1002"
-simple_limit = { limit = 5, period = 60 }
+simple = { limit = 5, period = 60 }
