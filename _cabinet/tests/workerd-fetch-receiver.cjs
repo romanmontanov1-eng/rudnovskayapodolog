@@ -1,0 +1,5 @@
+const {Miniflare}=require(process.env.MINIFLARE_MODULE||'miniflare');
+(async()=>{const mf=new Miniflare({modules:true,compatibilityDate:'2026-07-30',script:`
+class Repo{constructor(fetcher=fetch){this.fetcher=fetcher} async run(){return this.fetcher('https://api.github.com/repos/test/test')}}
+export default {async fetch(){const out=[];for(const mode of ['original','wrapped']){try{const repo=mode==='original'?new Repo():new Repo((...args)=>globalThis.fetch(...args));const r=await repo.run();out.push({mode,status:r.status,body:await r.text()})}catch(e){out.push({mode,name:e.name,message:e.message})}}return Response.json(out)}};
+`,outboundService:()=>new Response('upstream reached',{status:200})});const r=await mf.dispatchFetch('http://worker/');const data=await r.json();const assert=require('assert/strict');assert.equal(data[0].name,'TypeError');assert.match(data[0].message,/Illegal invocation/);assert.equal(data[1].status,200);console.log(JSON.stringify(data,null,2));await mf.dispose()})().catch(e=>{console.error(e);process.exit(1)});

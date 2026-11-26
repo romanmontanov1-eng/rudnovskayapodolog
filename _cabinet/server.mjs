@@ -15,16 +15,47 @@ function jpeg(bytes){
  while(p+4<bytes.length){if(bytes[p++]!==255)break;let marker=bytes[p++];if(marker===218)break;const size=(bytes[p]<<8)|bytes[p+1];if(size<2||p+size>bytes.length)throw new HttpError(422,'Повреждённое фото.');if(marker===225)throw new HttpError(422,'Фото должно быть подготовлено приложением.');if([192,193,194].includes(marker)){const h=(bytes[p+3]<<8)|bytes[p+4],w=(bytes[p+5]<<8)|bytes[p+6];dimensions={w,h}}p+=size;
  }if(!dimensions||Math.min(dimensions.w,dimensions.h)<1||Math.max(dimensions.w,dimensions.h)>1600)throw new HttpError(422,'Размер подготовленного фото должен быть до 1600 пикселей.');
 }
+export function githubFailure(error){
+ const name=['TypeError','Error','AbortError','TimeoutError','NetworkError'].includes(error?.name)?error.name:'Error';
+ const message=typeof error?.message==='string'?error.message:'';
+ const candidate=error?.cause?.code||error?.code;
+ const code=['ECONNRESET','ECONNREFUSED','ENOTFOUND','EAI_AGAIN','ETIMEDOUT','UND_ERR_CONNECT_TIMEOUT','CERT_HAS_EXPIRED','UNABLE_TO_VERIFY_LEAF_SIGNATURE','ERR_INVALID_THIS','ERR_INVALID_CHAR'].includes(candidate)?candidate:undefined;
+ let reason='fetch_exception';
+ if(/illegal invocation|incorrect [`']?this|invalid this/i.test(message)||code==='ERR_INVALID_THIS')reason='illegal_invocation';
+ else if(/header|ByteString|ISO-8859-1/i.test(message)||code==='ERR_INVALID_CHAR')reason='invalid_header';
+ else if(name==='AbortError'||name==='TimeoutError'||/TIMEOUT|TIMEDOUT/.test(code||''))reason='timeout';
+ else if(['ENOTFOUND','EAI_AGAIN'].includes(code))reason='dns';
+ else if(['CERT_HAS_EXPIRED','UNABLE_TO_VERIFY_LEAF_SIGNATURE'].includes(code))reason='tls';
+ else if(['ECONNRESET','ECONNREFUSED'].includes(code))reason='connection';
+ return {reason,exceptionName:name,...(code?{exceptionCode:code}:{})};
+}
+function githubEndpoint(path){if(path.startsWith('/git/ref'))return 'ref';if(path.startsWith('/git/commits'))return 'commit';if(path.startsWith('/git/trees'))return 'tree';if(path.startsWith('/git/blobs'))return 'blob';if(path.startsWith('/contents/'))return 'contents';return 'other'}
 export class GitRepository{
- constructor(env,fetcher=fetch){this.env=env;this.fetcher=fetcher;this.root=`https://api.github.com/repos/${env.GITHUB_REPOSITORY||'romanmontanov1-eng/rudnovskayapodolog'}`;this.branch=env.GALLERY_BRANCH||'main'}
- async api(path,method='GET',body){
- let r;try{r=await this.fetcher(this.root+path,{method,headers:{Authorization:`Bearer ${this.env.GITHUB_TOKEN}`,'User-Agent':'olga-works','Accept':'application/vnd.github+json','Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)})}catch{throw new HttpError(502,'Не удалось связаться с GitHub. Повторите позже.','GITHUB_NETWORK')}
- if(!r.ok){if(r.status===401)throw new HttpError(502,'Вход выполнен, но токен GitHub недействителен. Владелец должен обновить GITHUB_TOKEN в Cloudflare.','GITHUB_AUTH');if(r.status===403||r.status===429)throw new HttpError(502,'GitHub отклонил доступ или ограничил запросы. Владелец должен проверить права токена и лимиты GitHub.','GITHUB_ACCESS');throw new HttpError([409,422].includes(r.status)?409:502,r.status===404?'Не найдены данные сайта. Проверьте репозиторий, ветку и доступ токена.':'Не удалось сохранить в GitHub. Обновите список и повторите.','GITHUB_HTTP')}
- try{return await r.json()}catch{throw new HttpError(502,'GitHub вернул некорректный ответ. Повторите позже.','GITHUB_RESPONSE')}
+ // The native Workers fetch is receiver-sensitive. Never call it as this.fetcher.
+ constructor(env,fetcher=(...args)=>globalThis.fetch(...args),{requestId,logger=entry=>console.info(JSON.stringify(entry))}={}){
+ this.env=env;this.fetcher=fetcher;this.requestId=requestId;this.logger=logger;
+ const repo=env.GITHUB_REPOSITORY||'romanmontanov1-eng/rudnovskayapodolog';
+ if(!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo))throw new HttpError(503,'Некорректное имя репозитория в GITHUB_REPOSITORY.','GITHUB_CONFIG');
+ this.root=`https://api.github.com/repos/${repo}`;this.branch=env.GALLERY_BRANCH||'main';
+ if(typeof this.branch!=='string'||!this.branch||/[\s?#\x00-\x1f]/.test(this.branch))throw new HttpError(503,'Некорректная ветка GALLERY_BRANCH.','GITHUB_CONFIG');
  }
+ async api(path,method='GET',body){
+ const started=Date.now();const context={event:'github_request',requestId:this.requestId,method,endpoint:githubEndpoint(path),host:'api.github.com'};
+ const report=detail=>{try{this.logger({...context,durationMs:Date.now()-started,...detail})}catch{}};
+ const raw=this.env.GITHUB_TOKEN;const token=typeof raw==='string'?raw.trim():'';
+ if(!token||!/^[\x21-\x7e]+$/.test(token)||/["'`]/.test(token)){
+ report({githubStatus:null,reason:'invalid_token_header'});throw new HttpError(503,'GITHUB_TOKEN должен содержать только токен GitHub без кавычек, пробелов и переводов строк. Проверьте секрет в Cloudflare.','GITHUB_TOKEN_FORMAT');
+ }
+ let r;try{r=await this.fetcher(this.root+path,{method,redirect:'manual',headers:{Authorization:`Bearer ${token}`,'User-Agent':'olga-works','Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)})}catch(error){report({githubStatus:null,...githubFailure(error)});throw new HttpError(502,'Не удалось связаться с GitHub. Повторите позже.','GITHUB_NETWORK')}
+ const id=r.headers.get('x-github-request-id');const remaining=r.headers.get('x-ratelimit-remaining');
+ const upstream={githubStatus:r.status,...(id&&/^[A-Za-z0-9:-]{1,128}$/.test(id)?{githubRequestId:id}:{}),...(remaining&&/^\d{1,9}$/.test(remaining)?{rateLimitRemaining:Number(remaining)}:{})};
+ if(!r.ok){report({...upstream,reason:'http_error'});if(r.status===401)throw new HttpError(502,'Вход выполнен, но токен GitHub недействителен. Владелец должен обновить GITHUB_TOKEN в Cloudflare.','GITHUB_AUTH');if(r.status===403||r.status===429)throw new HttpError(502,'GitHub отклонил доступ или ограничил запросы. Владелец должен проверить права токена и лимиты GitHub.','GITHUB_ACCESS');throw new HttpError([409,422].includes(r.status)?409:502,r.status===404?'Не найдены данные сайта. Проверьте репозиторий, ветку и доступ токена.':'Не удалось сохранить в GitHub. Обновите список и повторите.','GITHUB_HTTP')}
+ try{const data=await r.json();report({...upstream,reason:'ok'});return data}catch(error){report({...upstream,reason:'invalid_response',...{exceptionName:githubFailure(error).exceptionName}});throw new HttpError(502,'GitHub вернул некорректный ответ. Повторите позже.','GITHUB_RESPONSE')}
+ }
+
  async text(path,ref){const d=await this.api(`/contents/${path}?ref=${encodeURIComponent(ref)}`);return decoder.decode(unbase64(d.content))}
- async read(){const ref=await this.api(`/git/ref/heads/${this.branch}`);const head=ref.object.sha;const commit=await this.api(`/git/commits/${head}`);const [catalog,index,works]=await Promise.all([this.text(CATALOG,head),this.text('index.html',head),this.text('works.html',head)]);return {head,tree:commit.tree.sha,catalog:validateCatalog(JSON.parse(catalog)),index,works}}
- async commit(state,files){const entries=await Promise.all(files.map(async f=>{const b=await this.api('/git/blobs','POST',{content:f.bytes?base64(f.bytes):f.text,encoding:f.bytes?'base64':'utf-8'});return {path:f.path,mode:'100644',type:'blob',sha:b.sha}}));const tree=await this.api('/git/trees','POST',{base_tree:state.tree,tree:entries});const commit=await this.api('/git/commits','POST',{message:'Обновить работу через кабинет Ольги',tree:tree.sha,parents:[state.head]});await this.api(`/git/refs/heads/${this.branch}`,'PATCH',{sha:commit.sha,force:false});return commit.sha}
+ async read(){const ref=await this.api(`/git/ref/heads/${encodeURIComponent(this.branch)}`);const head=ref.object.sha;const commit=await this.api(`/git/commits/${head}`);const [catalog,index,works]=await Promise.all([this.text(CATALOG,head),this.text('index.html',head),this.text('works.html',head)]);return {head,tree:commit.tree.sha,catalog:validateCatalog(JSON.parse(catalog)),index,works}}
+ async commit(state,files){const entries=await Promise.all(files.map(async f=>{const b=await this.api('/git/blobs','POST',{content:f.bytes?base64(f.bytes):f.text,encoding:f.bytes?'base64':'utf-8'});return {path:f.path,mode:'100644',type:'blob',sha:b.sha}}));const tree=await this.api('/git/trees','POST',{base_tree:state.tree,tree:entries});const commit=await this.api('/git/commits','POST',{message:'Обновить работу через кабинет Ольги',tree:tree.sha,parents:[state.head]});await this.api(`/git/refs/heads/${encodeURIComponent(this.branch)}`,'PATCH',{sha:commit.sha,force:false});return commit.sha}
 }
 export async function saveWork(repo,input){
  const {id,operation,revision,title,visible}=input;
@@ -45,7 +76,7 @@ export async function saveWork(repo,input){
  try{return {work,commit:await repo.commit(state,files)}}catch(e){if(e.status!==409||attempt===2)throw e}
  }
 }
-export function createServer(assets,{repository=env=>new GitRepository(env),fetcher=fetch}={}){return {async fetch(req,env){const requestId=crypto.randomUUID();try{
+export function createServer(assets,{repository=(env,context)=>new GitRepository(env,undefined,context),fetcher=fetch}={}){return {async fetch(req,env){const requestId=crypto.randomUUID();try{
  const url=new URL(req.url),path=url.pathname;
  const security={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://raw.githubusercontent.com https://romanmontanov1-eng.github.io; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"};
  if(/^\/icon-(180|192|512)\.png$/.test(path)&&assets.icons){const size=path.match(/(180|192|512)/)[1];return new Response(unbase64(assets.icons[size]),{headers:{...security,'Content-Type':'image/png'}});}
@@ -71,13 +102,13 @@ export function createServer(assets,{repository=env=>new GitRepository(env),fetc
  if(!await session(req,env))throw new HttpError(401,'Войдите в кабинет.','SESSION_REQUIRED');
  if(path==='/api/session'&&req.method==='GET')return json({authenticated:true},200,{'X-Request-ID':requestId});
  if(!env.GITHUB_TOKEN)throw new HttpError(503,'Вход выполнен, но доступ к GitHub не настроен. Владелец должен задать GITHUB_TOKEN в Cloudflare.','GITHUB_NOT_CONFIGURED');
- if(path==='/api/works'&&req.method==='GET'){const s=await repository(env).read();return json({works:s.catalog.works.map(({operations,...w})=>w),imageBase:`https://raw.githubusercontent.com/${env.GITHUB_REPOSITORY||'romanmontanov1-eng/rudnovskayapodolog'}/${s.head}/`},200,{'X-Request-ID':requestId})}
+ if(path==='/api/works'&&req.method==='GET'){const s=await repository(env,{requestId}).read();return json({works:s.catalog.works.map(({operations,...w})=>w),imageBase:`https://raw.githubusercontent.com/${env.GITHUB_REPOSITORY||'romanmontanov1-eng/rudnovskayapodolog'}/${s.head}/`},200,{'X-Request-ID':requestId})}
  if(path==='/api/works'&&req.method==='POST'){
  if(Number(req.headers.get('Content-Length'))>3000000)return json({error:'Слишком большой запрос.'},413);
  const reader=req.body?.getReader();if(!reader)throw new HttpError(400,'Пустой запрос.');let length=0;const chunks=[];for(;;){const {done,value}=await reader.read();if(done)break;length+=value.length;if(length>3000000){await reader.cancel();throw new HttpError(413,'Слишком большой запрос.')}chunks.push(value)}const form=await new Response(new Blob(chunks),{headers:{'Content-Type':req.headers.get('Content-Type')||''}}).formData();const input={id:form.get('id'),operation:form.get('operation'),revision:Number(form.get('revision')),title:form.get('title'),visible:form.get('visible')==='true',before:form.get('before'),after:form.get('after'),beforeRef:form.get('beforeRef'),afterRef:form.get('afterRef')};
- const result=await saveWork(repository(env),input);const {operations,...work}=result.work;return json({...result,work,message:'Сохранено в репозитории. Ожидается обновление сайта.'})}
+ const result=await saveWork(repository(env,{requestId}),input);const {operations,...work}=result.work;return json({...result,work,message:'Сохранено в репозитории. Ожидается обновление сайта.'})}
  if(path==='/api/site-status'&&req.method==='GET'){
  if((env.GALLERY_BRANCH||'main')!=='main')return json({state:'staging',message:'Сохранено в тестовой ветке. Действующий сайт не изменён.'});
- const s=await repository(env).read();const r=await fetcher('https://romanmontanov1-eng.github.io/rudnovskayapodolog/works.html?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error();const html=await r.text();const matches=s.catalog.works.every(w=>w.visible?html.includes(`data-work-id="${w.id}" data-revision="${w.revision}"`):!html.includes(`data-work-id="${w.id}"`));return json({state:matches?'live':'pending',message:matches?'Изменения уже появились на сайте.':'Сохранено. Сайт ещё обновляется.'})}
+ const s=await repository(env,{requestId}).read();const r=await fetcher('https://romanmontanov1-eng.github.io/rudnovskayapodolog/works.html?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error();const html=await r.text();const matches=s.catalog.works.every(w=>w.visible?html.includes(`data-work-id="${w.id}" data-revision="${w.revision}"`):!html.includes(`data-work-id="${w.id}"`));return json({state:matches?'live':'pending',message:matches?'Изменения уже появились на сайте.':'Сохранено. Сайт ещё обновляется.'})}
  return json({error:'Не найдено.'},404);
  }catch(e){const status=e instanceof HttpError?e.status:502,code=e instanceof HttpError?e.code:'INTERNAL_ERROR';console.error(JSON.stringify({requestId,path:new URL(req.url).pathname,status,code}));return json({error:e instanceof HttpError?e.message:'Не удалось выполнить запрос. Поля сохранены — попробуйте ещё раз.',code,requestId},status,{'X-Request-ID':requestId})}}}}

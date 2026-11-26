@@ -1,0 +1,12 @@
+[
+  {
+    "mode": "original",
+    "name": "TypeError",
+    "message": "Illegal invocation: function called with incorrect `this` reference. See https://developers.cloudflare.com/workers/observability/errors/#illegal-invocation-errors for details."
+  },
+  {
+    "mode": "wrapped",
+    "status": 200,
+    "body": "upstream reached"
+  }
+]
