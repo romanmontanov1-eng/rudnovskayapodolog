@@ -1,0 +1,17 @@
+{
+  "runtime": "workerd",
+  "loaded": 6,
+  "publicationCycle": [
+    "create",
+    "rename",
+    "replace-before",
+    "hide",
+    "replay"
+  ],
+  "commits": 4,
+  "githubRequests": 57,
+  "finalVisible": 6,
+  "homeCards": 2,
+  "realCredentialsUsed": false,
+  "productionWrites": false
+}
