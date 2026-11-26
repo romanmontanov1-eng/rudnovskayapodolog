@@ -1,0 +1,56 @@
+[
+  {
+    "case": "JPEG+PNG → validate → swap → replace → save draft → reload → publish → edit → hide",
+    "posts": 3,
+    "visibleGallery": 6,
+    "errors": []
+  },
+  {
+    "case": "IDB transaction never completes",
+    "buttonsRecovered": true,
+    "formPhotos": 2,
+    "posts": 0,
+    "status": "Сохранение в браузере не завершилось. Повторите действие. Данные остаются в открытой форме; не закрывайте страницу. Работа не отправлена на сайт.",
+    "errors": []
+  },
+  {
+    "case": "IDB open",
+    "buttonsRecovered": true,
+    "status": "Хранилище черновиков не ответило. Повторите сохранение. Данные остаются в открытой форме; не закрывайте страницу.",
+    "errors": []
+  },
+  {
+    "case": "IDB quota",
+    "buttonsRecovered": true,
+    "status": "Браузер не сохранил черновик. Проверьте свободное место и разрешение на хранение данных. Данные остаются в открытой форме; не закрывайте страницу.",
+    "errors": []
+  },
+  {
+    "case": "broken.heic",
+    "decoded": false,
+    "status": "Не удалось прочитать этот формат. Если это HEIC/HEIF, экспортируйте фото в JPEG или PNG. Название и выбранные снимки сохранены в форме."
+  },
+  {
+    "case": "photo.heic",
+    "decoded": false,
+    "status": "Не удалось прочитать этот формат. Если это HEIC/HEIF, экспортируйте фото в JPEG или PNG. Название и выбранные снимки сохранены в форме."
+  },
+  {
+    "case": "photo decode",
+    "buttonsRecovered": true,
+    "previousPhotoKept": true,
+    "status": "Чтение фото заняло слишком много времени. Выберите JPEG/PNG или уменьшенную копию."
+  },
+  {
+    "case": "photo encode",
+    "buttonsRecovered": true,
+    "previousPhotoKept": true,
+    "status": "Подготовка фото не завершилась. Выберите другой JPEG/PNG."
+  },
+  {
+    "case": "photo null",
+    "buttonsRecovered": true,
+    "previousPhotoKept": true,
+    "status": "Не удалось уменьшить фото. Выберите другой снимок."
+  }
+]
