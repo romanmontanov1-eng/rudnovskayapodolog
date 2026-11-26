@@ -1,0 +1,185 @@
+[
+  {
+    "case": "published imported module blocked",
+    "handler": "object",
+    "requests": [
+      {
+        "method": "GET",
+        "path": "/"
+      },
+      {
+        "method": "GET",
+        "path": "/manifest.webmanifest"
+      },
+      {
+        "method": "GET",
+        "path": "/app.css"
+      },
+      {
+        "method": "GET",
+        "path": "/app.js"
+      },
+      {
+        "method": "GET",
+        "path": "/api-client.mjs"
+      }
+    ],
+    "responses": [
+      {
+        "path": "/",
+        "status": 200
+      },
+      {
+        "path": "/manifest.webmanifest",
+        "status": 200
+      },
+      {
+        "path": "/app.css",
+        "status": 200
+      },
+      {
+        "path": "/app.js",
+        "status": 200
+      }
+    ],
+    "errors": []
+  },
+  {
+    "case": "published native GET fallback",
+    "after": [
+      {
+        "method": "GET",
+        "path": "/"
+      },
+      {
+        "method": "GET",
+        "path": "/manifest.webmanifest"
+      },
+      {
+        "method": "GET",
+        "path": "/app.css"
+      },
+      {
+        "method": "GET",
+        "path": "/app.js"
+      },
+      {
+        "method": "GET",
+        "path": "/api-client.mjs"
+      },
+      {
+        "method": "GET",
+        "path": "/api/session"
+      }
+    ]
+  },
+  {
+    "case": "candidate: bundled script, denied IndexedDB, invalid then test login",
+    "status": "Неверный пароль.",
+    "requests": [
+      {
+        "method": "GET",
+        "path": "/"
+      },
+      {
+        "method": "GET",
+        "path": "/manifest.webmanifest"
+      },
+      {
+        "method": "GET",
+        "path": "/app.css"
+      },
+      {
+        "method": "GET",
+        "path": "/app.js"
+      },
+      {
+        "method": "GET",
+        "path": "/api/session"
+      },
+      {
+        "method": "POST",
+        "path": "/api/login"
+      },
+      {
+        "method": "GET",
+        "path": "/"
+      },
+      {
+        "method": "GET",
+        "path": "/manifest.webmanifest"
+      },
+      {
+        "method": "GET",
+        "path": "/app.css"
+      },
+      {
+        "method": "GET",
+        "path": "/app.js"
+      },
+      {
+        "method": "GET",
+        "path": "/api/session"
+      }
+    ],
+    "responses": [
+      {
+        "path": "/",
+        "status": 200
+      },
+      {
+        "path": "/app.js",
+        "status": 200
+      },
+      {
+        "path": "/app.css",
+        "status": 200
+      },
+      {
+        "path": "/manifest.webmanifest",
+        "status": 200
+      },
+      {
+        "path": "/api/session",
+        "status": 401
+      },
+      {
+        "path": "/api/login",
+        "status": 401
+      },
+      {
+        "path": "/",
+        "status": 200
+      },
+      {
+        "path": "/app.js",
+        "status": 200
+      },
+      {
+        "path": "/manifest.webmanifest",
+        "status": 200
+      },
+      {
+        "path": "/app.css",
+        "status": 200
+      },
+      {
+        "path": "/api/session",
+        "status": 401
+      }
+    ],
+    "errors": []
+  },
+  {
+    "case": "candidate warm reload",
+    "cache": {
+      "sw": null,
+      "registrations": 0,
+      "cache": [],
+      "width": 390
+    }
+  },
+  {
+    "case": "candidate main script fails: visible loading guidance and disabled submit"
+  }
+]

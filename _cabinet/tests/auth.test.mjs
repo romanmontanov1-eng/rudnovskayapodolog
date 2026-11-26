@@ -49,7 +49,7 @@ test('client: полные HTML 502, повреждённый JSON, сетево
 });
 test('UI: successful login + failed works не сбрасывает экран на login; при failed login пароль остаётся',async()=>{
  const source=(await readFile(new URL('../app.js',import.meta.url),'utf8')).replace("import {requestJSON} from './api-client.mjs';",'');
- const nodes=new Map();const node=s=>{if(!nodes.has(s))nodes.set(s,{hidden:true,value:'Тестовый пароль',textContent:'',disabled:false});return nodes.get(s)};
+ const nodes=new Map();const node=s=>{if(!nodes.has(s))nodes.set(s,{hidden:true,value:'Тестовый пароль',textContent:'',disabled:false,addEventListener(){},querySelector(){return {disabled:false}}});return nodes.get(s)};
  let accepted=false;
  const context={document:{querySelector:node,querySelectorAll:()=>[]},indexedDB:{open:()=>({})},window:{scrollTo(){},addEventListener(){}},navigator:{onLine:true},URL,Blob,Image:class{},crypto,structuredClone,requestJSON:async(path)=>{if(path==='/api/session')throw Object.assign(Error('Войдите'),{status:401});if(path==='/api/login'){if(!accepted)throw Object.assign(Error('Неверный пароль'),{status:401});return{ok:true}}if(path==='/api/works')throw Object.assign(Error('GitHub недоступен'),{status:502})}};
  vm.runInNewContext(source,context);await new Promise(setImmediate);

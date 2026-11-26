@@ -1,0 +1,70 @@
+{
+  "resources": [
+    {
+      "path": "/",
+      "status": 200,
+      "type": "text/html;charset=utf-8",
+      "cache": "no-store"
+    },
+    {
+      "path": "/manifest.webmanifest",
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "cache": "no-store"
+    },
+    {
+      "path": "/app.css",
+      "status": 200,
+      "type": "text/css;charset=utf-8",
+      "cache": "no-store"
+    },
+    {
+      "path": "/app.js",
+      "status": 200,
+      "type": "text/javascript;charset=utf-8",
+      "cache": "no-store"
+    },
+    {
+      "path": "/api-client.mjs",
+      "status": 200,
+      "type": "text/javascript;charset=utf-8",
+      "cache": "no-store"
+    },
+    {
+      "path": "/api/session",
+      "status": 401,
+      "type": "application/json; charset=utf-8",
+      "cache": "no-store"
+    },
+    {
+      "path": "/api/login",
+      "status": 401,
+      "type": "application/json; charset=utf-8",
+      "cache": "no-store"
+    }
+  ],
+  "errors": [],
+  "failures": [],
+  "requests": [
+    {
+      "path": "/api/session",
+      "method": "GET"
+    },
+    {
+      "path": "/api/login",
+      "method": "POST"
+    }
+  ],
+  "initial": {
+    "handler": "function",
+    "visible": true,
+    "sw": null,
+    "registrations": 0,
+    "caches": [],
+    "width": 390
+  },
+  "after": {
+    "status": "Неверный пароль.",
+    "buttonDisabled": false
+  }
+}
