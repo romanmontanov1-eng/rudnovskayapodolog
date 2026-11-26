@@ -1,1 +1,7 @@
-{"private":true,"scripts":{"dev":"node _cabinet/dev.mjs","test":"node _cabinet/tests/publication.test.mjs"}}
+{
+  "private": true,
+  "scripts": {
+    "dev": "node _cabinet/dev.mjs",
+    "test": "node --test _cabinet/tests/*.test.mjs"
+  }
+}
