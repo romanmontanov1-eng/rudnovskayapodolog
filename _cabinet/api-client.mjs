@@ -1,7 +1,7 @@
 export class ApiError extends Error {
  constructor(message,{path,status=0,code='NETWORK',requestId=null,unknown=false}={}){super(message);Object.assign(this,{path,status,code,requestId,unknown})}
 }
-export async function requestJSON(path,options={}, {fetcher=fetch,timeoutMs=30000}={}) {
+export async function requestJSON(path,options={}, {fetcher=(...args)=>globalThis.fetch(...args),timeoutMs=30000}={}) {
  const mutation=path==='/api/works'&&options.method==='POST';
  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeoutMs);
  let response,text;
@@ -9,7 +9,7 @@ export async function requestJSON(path,options={}, {fetcher=fetch,timeoutMs=3000
   response=await fetcher(path,{...options,credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json',...options.headers},signal:controller.signal});
   text=await response.text();
  } catch {
-  throw new ApiError(controller.signal.aborted?'Сервер не ответил вовремя. Проверьте соединение и повторите действие.':'Не удалось связаться с сервером. Проверьте интернет и повторите действие.',{path,status:response?.status||0,code:controller.signal.aborted?'TIMEOUT':'NETWORK',unknown:mutation});
+  throw new ApiError(controller.signal.aborted?'Сервер не ответил вовремя. Проверьте соединение и повторите действие.':`Не удалось связаться с сервером (${path}, NETWORK). Проверьте интернет и повторите действие.`,{path,status:response?.status||0,code:controller.signal.aborted?'TIMEOUT':'NETWORK',unknown:mutation});
  } finally {clearTimeout(timer)}
  const meta={path,status:response.status,requestId:response.headers.get('X-Request-ID')||response.headers.get('CF-Ray'),unknown:mutation&&response.status>=500};
  const type=response.headers.get('Content-Type')||'';
