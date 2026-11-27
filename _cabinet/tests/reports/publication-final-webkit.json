@@ -1,0 +1,404 @@
+[
+  {
+    "case": "local failure before fetch",
+    "fetchCalls": 0,
+    "posts": 0,
+    "commits": 0,
+    "draftState": "not-sent",
+    "status": "Браузер не смог подготовить запрос публикации. Работа не отправлена на сайт. Черновик сохранён на устройстве. Код проверки: PUBLICATION_REQUEST_BUILD.",
+    "stages": [
+      {
+        "event": "publication",
+        "stage": "validate",
+        "outcome": "started",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "snapshot",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "multipart",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "request-build",
+        "outcome": "failed",
+        "code": "PUBLICATION_REQUEST_BUILD",
+        "exceptionName": "TypeError",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "validate",
+        "outcome": "started",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "snapshot",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "multipart",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "request-build",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "draft-save",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "dispatch",
+        "outcome": "attempted",
+        "dispatched": true,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "response",
+        "outcome": "received",
+        "status": 200,
+        "dispatched": true,
+        "responseReceived": true
+      },
+      {
+        "event": "publication",
+        "stage": "response",
+        "outcome": "confirmed",
+        "dispatched": true,
+        "responseReceived": true
+      }
+    ]
+  },
+  {
+    "case": "retry after local failure",
+    "commitsCreated": 1
+  },
+  {
+    "case": "local clone failure",
+    "fetchCalls": 0,
+    "posts": 0,
+    "commits": 0,
+    "status": "Не удалось подготовить снимки или скопировать данные черновика. Работа не отправлена на сайт. Черновик сохранён на устройстве. Код проверки: PUBLICATION_SNAPSHOT.",
+    "stages": [
+      {
+        "event": "publication",
+        "stage": "validate",
+        "outcome": "started",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "snapshot",
+        "outcome": "failed",
+        "exceptionName": "DataCloneError",
+        "dispatched": false,
+        "responseReceived": false
+      }
+    ]
+  },
+  {
+    "case": "local storage failure",
+    "fetchCalls": 0,
+    "posts": 0,
+    "commits": 0,
+    "status": "Не удалось сохранить черновик перед отправкой. Проверьте место и разрешение на хранение данных. Работа не отправлена на сайт. Черновик сохранён на устройстве. Код проверки: PUBLICATION_STORAGE.",
+    "stages": [
+      {
+        "event": "publication",
+        "stage": "validate",
+        "outcome": "started",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "snapshot",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "multipart",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "request-build",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "draft-save",
+        "outcome": "failed",
+        "code": "PUBLICATION_STORAGE",
+        "exceptionName": "Error",
+        "dispatched": false,
+        "responseReceived": false
+      }
+    ]
+  },
+  {
+    "case": "bytes transport → commit → pages → lost response → idempotent retry → edit → hide",
+    "newCommits": 3,
+    "pairComplete": true,
+    "sameOperation": true,
+    "stages": [
+      {
+        "event": "publication",
+        "stage": "validate",
+        "outcome": "started",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "snapshot",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "multipart",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "request-build",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "draft-save",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "dispatch",
+        "outcome": "attempted",
+        "dispatched": true,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "dispatch",
+        "outcome": "failed",
+        "code": "NETWORK",
+        "status": 0,
+        "exceptionName": "Error",
+        "dispatched": true,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "validate",
+        "outcome": "started",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "snapshot",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "multipart",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "request-build",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "draft-save",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "dispatch",
+        "outcome": "attempted",
+        "dispatched": true,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "response",
+        "outcome": "received",
+        "status": 200,
+        "dispatched": true,
+        "responseReceived": true
+      },
+      {
+        "event": "publication",
+        "stage": "response",
+        "outcome": "confirmed",
+        "dispatched": true,
+        "responseReceived": true
+      },
+      {
+        "event": "publication",
+        "stage": "validate",
+        "outcome": "started",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "snapshot",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "multipart",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "request-build",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "draft-save",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "dispatch",
+        "outcome": "attempted",
+        "dispatched": true,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "response",
+        "outcome": "received",
+        "status": 200,
+        "dispatched": true,
+        "responseReceived": true
+      },
+      {
+        "event": "publication",
+        "stage": "response",
+        "outcome": "confirmed",
+        "dispatched": true,
+        "responseReceived": true
+      },
+      {
+        "event": "publication",
+        "stage": "validate",
+        "outcome": "started",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "snapshot",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "multipart",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "request-build",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "draft-save",
+        "outcome": "ok",
+        "dispatched": false,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "dispatch",
+        "outcome": "attempted",
+        "dispatched": true,
+        "responseReceived": false
+      },
+      {
+        "event": "publication",
+        "stage": "response",
+        "outcome": "received",
+        "status": 200,
+        "dispatched": true,
+        "responseReceived": true
+      },
+      {
+        "event": "publication",
+        "stage": "response",
+        "outcome": "confirmed",
+        "dispatched": true,
+        "responseReceived": true
+      }
+    ]
+  }
+]
