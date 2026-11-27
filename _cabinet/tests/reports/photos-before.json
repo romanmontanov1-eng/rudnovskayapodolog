@@ -1,0 +1,27 @@
+{
+  "preview": true,
+  "buttons": [
+    {
+      "text": "К списку работ",
+      "disabled": true
+    },
+    {
+      "text": "Поменять местами",
+      "disabled": true
+    },
+    {
+      "text": "Опубликовать",
+      "disabled": true
+    },
+    {
+      "text": "Сохранить черновик",
+      "disabled": true
+    },
+    {
+      "text": "Снять с показа",
+      "disabled": true
+    }
+  ],
+  "status": "Подготавливаю фото…",
+  "title": "Тест зависшего черновика"
+}
